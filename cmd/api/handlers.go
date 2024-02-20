@@ -50,6 +50,11 @@ func (app *Application) Authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// check password
+	valid, err := user.PasswordMatches(requestPayload.Password)
+	if err != nil || !valid {
+		app.errorJSON(w, errors.New("invalid credentials"), http.StatusBadRequest)
+		return
+	}
 
 	// create a jwt user
 	u := jwtUser{
