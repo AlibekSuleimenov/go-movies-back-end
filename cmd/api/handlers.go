@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 	"net/http"
 )
 
@@ -58,9 +57,9 @@ func (app *Application) Authenticate(w http.ResponseWriter, r *http.Request) {
 
 	// create a jwt user
 	u := jwtUser{
-		ID:        1,
-		FirstName: "Admin",
-		LastName:  "User",
+		ID:        user.ID,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
 	}
 
 	// generate tokens
@@ -70,9 +69,8 @@ func (app *Application) Authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(tokens.Token)
 	refreshCookie := app.Auth.GetRefreshCookie(tokens.RefreshToken)
 	http.SetCookie(w, refreshCookie)
 
-	w.Write([]byte(tokens.Token))
+	app.writeJSON(w, http.StatusAccepted, tokens)
 }
