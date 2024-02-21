@@ -14,7 +14,7 @@ func (app *Application) Home(w http.ResponseWriter, r *http.Request) {
 		Version string `json:"version"`
 	}{
 		Status:  "active",
-		Message: "Go Movies upp and running",
+		Message: "Go Movies up and running",
 		Version: "1.0.0",
 	}
 
@@ -85,7 +85,7 @@ func (app *Application) RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 			// parse the token to get the claims
 			_, err := jwt.ParseWithClaims(refreshToken, claims, func(token *jwt.Token) (interface{}, error) {
-				return ([]byte(app.JWTSecret)), nil
+				return []byte(app.JWTSecret), nil
 			})
 			if err != nil {
 				app.errorJSON(w, errors.New("unauthorized"), http.StatusUnauthorized)
