@@ -13,14 +13,15 @@ import (
 const port = 8080
 
 type Application struct {
-	DSN          string
-	Domain       string
-	DB           repository.DatabaseRepo
-	Auth         Auth
-	JWTSecret    string
-	JWTIssuer    string
-	JWTAudience  string
-	CookieDomain string
+	DSN              string
+	Domain           string
+	DB               repository.DatabaseRepo
+	Auth             Auth
+	JWTSecret        string
+	JWTIssuer        string
+	JWTAudience      string
+	CookieDomain     string
+	TheMovieDBAPIKey string
 }
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 	flag.StringVar(&app.JWTAudience, "jwt-audience", "example.com", "signing audience")
 	flag.StringVar(&app.CookieDomain, "cookie-domain", "localhost", "cookie domain")
 	flag.StringVar(&app.Domain, "domain", "example.com", "domain")
+	flag.StringVar(&app.TheMovieDBAPIKey, "tmdb-api-key", "a9e4396bb380e9bd51f5746d5cafa231", "api key from tmdb")
 	flag.Parse()
 
 	// connect to the database
