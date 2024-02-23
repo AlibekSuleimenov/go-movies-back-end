@@ -20,6 +20,7 @@ func (app *Application) routes() http.Handler {
 	mux.Get("/movies", app.AllMovies)
 	mux.Get("/movies/{id}", app.GetMovie)
 	mux.Get("/genres", app.AllGenres)
+	mux.Get("/movies/genres/{id}", app.AllMoviesByGenre)
 
 	mux.Route("/admin", func(mux chi.Router) {
 		mux.Use(app.enableCORS)
