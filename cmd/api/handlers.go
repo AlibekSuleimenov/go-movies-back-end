@@ -362,14 +362,10 @@ func (app *Application) AllMoviesByGenre(w http.ResponseWriter, r *http.Request)
 
 func (app *Application) moviesGraphQL(w http.ResponseWriter, r *http.Request) {
 	// we need to populate our Graph type with the movies
-	movies, err := app.DB.AllMovies()
-	if err != nil {
-		app.errorJSON(w, err)
-		return
-	}
+	movies, _ := app.DB.AllMovies()
 
 	// get the query from the request
-	q, err := io.ReadAll(r.Body)
+	q, _ := io.ReadAll(r.Body)
 	query := string(q)
 
 	// create a new variable of type *graph.Graph
@@ -379,14 +375,14 @@ func (app *Application) moviesGraphQL(w http.ResponseWriter, r *http.Request) {
 	g.QueryString = query
 
 	// perform the query
-	response, err := g.Query()
+	resp, err := g.Query()
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
 	// send the response
-	j, _ := json.MarshalIndent(response, "", "\t")
+	j, _ := json.MarshalIndent(resp, "", "\t")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(j)

@@ -3,10 +3,12 @@ package graph
 import (
 	"errors"
 	"github.com/alibeksuleimenov/go-movies-back-end/internal/models"
-	"github.com/graphql-go/graphql"
 	"strings"
+
+	"github.com/graphql-go/graphql"
 )
 
+// Graph is the type for our graphql operations
 type Graph struct {
 	Movies      []*models.Movie
 	QueryString string
@@ -15,7 +17,10 @@ type Graph struct {
 	movieType   *graphql.Object
 }
 
+// New is the factory method to create a new instance of the Graph type.
 func New(movies []*models.Movie) *Graph {
+
+	// Define the object for our movie. The fields match database field names.
 	var movieType = graphql.NewObject(
 		graphql.ObjectConfig{
 			Name: "Movie",
@@ -29,7 +34,7 @@ func New(movies []*models.Movie) *Graph {
 				"description": &graphql.Field{
 					Type: graphql.String,
 				},
-				"release_data": &graphql.Field{
+				"release_date": &graphql.Field{
 					Type: graphql.DateTime,
 				},
 				"runtime": &graphql.Field{
@@ -51,7 +56,9 @@ func New(movies []*models.Movie) *Graph {
 		},
 	)
 
+	// define a fields variable, which lists available actions (list, search, get)
 	var fields = graphql.Fields{
+
 		"list": &graphql.Field{
 			Type:        graphql.NewList(movieType),
 			Description: "Get all movies",
@@ -90,8 +97,8 @@ func New(movies []*models.Movie) *Graph {
 					Type: graphql.Int,
 				},
 			},
-			Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-				id, ok := params.Args["id"].(int)
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				id, ok := p.Args["id"].(int)
 				if ok {
 					for _, movie := range movies {
 						if movie.ID == id {
@@ -104,37 +111,28 @@ func New(movies []*models.Movie) *Graph {
 		},
 	}
 
+	// return a pointer to the Graph type, populated with the correct information
 	return &Graph{
 		Movies:    movies,
 		fields:    fields,
 		movieType: movieType,
 	}
+
 }
 
 func (g *Graph) Query() (*graphql.Result, error) {
-	rootQuery := graphql.ObjectConfig{
-		Name:   "RootQuery",
-		Fields: g.fields,
-	}
-
-	schemaConfig := graphql.SchemaConfig{
-		Query: graphql.NewObject(rootQuery),
-	}
-
+	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: g.fields}
+	schemaConfig := graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)}
 	schema, err := graphql.NewSchema(schemaConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	params := graphql.Params{
-		Schema:        schema,
-		RequestString: g.QueryString,
-	}
-
-	response := graphql.Do(params)
-	if len(response.Errors) > 0 {
+	params := graphql.Params{Schema: schema, RequestString: g.QueryString}
+	resp := graphql.Do(params)
+	if len(resp.Errors) > 0 {
 		return nil, errors.New("error executing query")
 	}
 
-	return response, nil
+	return resp, nil
 }
